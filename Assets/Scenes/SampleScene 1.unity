@@ -4136,7 +4136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LevelPages: {fileID: 1278666}
   pagePrefab: {fileID: 4844604249545346755, guid: 920da6ff0bab3b44c885af42007f95a6, type: 3}
-  itemPrefab: {fileID: 9186807129608465854, guid: 1b6ca115b31dd34488145463ccc7be29, type: 3}
+  itemPrefab: {fileID: 139617912512825153, guid: 60df906648624b1418f0006db2c1660d, type: 3}
   inputItemNameField: {fileID: 1209273298}
 --- !u!1001 &1627011931
 PrefabInstance:
