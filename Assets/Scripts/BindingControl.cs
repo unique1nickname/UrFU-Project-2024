@@ -8,6 +8,7 @@ public class BindingControl : MonoBehaviour
     [SerializeField] public GameObject LevelPages;
     [SerializeField] public GameObject pagePrefab;
     [SerializeField] public GameObject itemPrefab;
+    [SerializeField] public GameObject inputItemNameWindow;
 
     [SerializeField] InputField inputItemNameField;
 
@@ -32,7 +33,7 @@ public class BindingControl : MonoBehaviour
 
     public void BeginMakingNewItem()
     {
-
+        inputItemNameWindow.SetActive(true);
     }
 
     public void AddNewItem()
@@ -48,6 +49,7 @@ public class BindingControl : MonoBehaviour
                 {
                     GameObject newItem = Instantiate(itemPrefab);
                     newItem.transform.SetParent(slot);
+                    newItem.transform.localScale = Vector3.one;
                     //GameObject itemNameObject = new GameObject(itemName);
                     //itemNameObject.name = itemName;
                     //itemNameObject.transform.SetParent(newItem.transform);
@@ -57,7 +59,10 @@ public class BindingControl : MonoBehaviour
                     itemUIText.text = itemName;
                     itemUIText.raycastTarget = false;
                     itemUIText.fontSize = 24;
+                    itemUIText.color = Color.black;
+                    itemUIText.alignment = TextAnchor.MiddleCenter;
                     itemNameObject.transform.SetParent(newItem.transform);
+                    inputItemNameWindow.SetActive(false);
                     return;
                 }
             }
