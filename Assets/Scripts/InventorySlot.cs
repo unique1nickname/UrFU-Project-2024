@@ -11,7 +11,9 @@ public class InventorySlot : MonoBehaviour, IDropHandler
         {
             GameObject dropped = eventData.pointerDrag;
             DraggableItem draggableItem = dropped.GetComponent<DraggableItem>();
-            if (draggableItem != null) draggableItem.parentAfterDrag = transform;
+            // если айтем не пустой и если это €чейка пулла или €чейка грида с таким же тегом или айтем в режиме настройки, то перетащить айтем в данную €чейку
+            if (draggableItem != null && (gameObject.tag == "Untagged" || draggableItem.tag == gameObject.tag || draggableItem.tag == "setting")) draggableItem.parentAfterDrag = transform;
+            // if (draggableItem != null) draggableItem.parentAfterDrag = transform;
         }
     }
 }

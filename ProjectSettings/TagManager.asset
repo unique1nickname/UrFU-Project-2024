@@ -10,6 +10,7 @@ TagManager:
   - Slot4
   - Slot5
   - Slot6
+  - setting
   layers:
   - Default
   - TransparentFX
