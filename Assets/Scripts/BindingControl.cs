@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 public class BindingControl : MonoBehaviour
 {
@@ -16,6 +18,11 @@ public class BindingControl : MonoBehaviour
 
 
     [SerializeField] InputField inputItemNameField;
+    
+    // для функции в инспекторе
+    [HideInInspector] public string newItemName;
+
+    [SerializeField] public GameObject[] itemsArray;
 
     public void MakeNewPage()
     {
@@ -31,19 +38,14 @@ public class BindingControl : MonoBehaviour
     {
         if (LevelPages.transform.childCount > 1)
         {
-            Destroy(LevelPages.transform.GetChild(LevelPages.transform.childCount - 1).gameObject);
+            DestroyImmediate(LevelPages.transform.GetChild(LevelPages.transform.childCount - 1).gameObject);
             // LevelPages.transform.GetChild(LevelPages.transform.childCount - 1).gameObject.SetActive(false);
         }
     }
 
-    public void BeginMakingNewItem()
-    {
-        inputItemNameWindow.SetActive(true);
-    }
-
     public void AddNewItem()
     {
-        string itemName = inputItemNameField.text;
+        string itemName = newItemName;
         for (int pageNum = 0; pageNum < LevelPages.transform.childCount; pageNum++)
         {
             Transform page = LevelPages.transform.GetChild(pageNum);
@@ -55,10 +57,10 @@ public class BindingControl : MonoBehaviour
                     GameObject newItem = Instantiate(itemPrefab);
                     newItem.transform.SetParent(slot);
                     newItem.transform.localScale = Vector3.one;
+
+                    // убрать после приведения скрипта в порядок
                     if (OnSetting) newItem.tag = "setting";
-                    //GameObject itemNameObject = new GameObject(itemName);
-                    //itemNameObject.name = itemName;
-                    //itemNameObject.transform.SetParent(newItem.transform);
+                    
                     GameObject itemNameObject = new GameObject(itemName);
                     Text itemUIText = itemNameObject.AddComponent<Text>();
                     itemUIText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -75,6 +77,22 @@ public class BindingControl : MonoBehaviour
         }
         MakeNewPage();
         AddNewItem();
+    }
+
+    public void ClearAllSlots()
+    {
+        for (int pageNum = 0; pageNum < LevelPages.transform.childCount; pageNum++)
+        {
+            Transform page = LevelPages.transform.GetChild(pageNum);
+            for (int slotNum = 0; slotNum < page.childCount; slotNum++)
+            {
+                Transform slot = page.transform.GetChild(slotNum);
+                if (slot.childCount != 0)
+                {
+                    DestroyImmediate(slot.GetChild(0).gameObject);
+                }
+            }
+        }
     }
 
     public void StartSettingItems()
@@ -121,6 +139,88 @@ public class BindingControl : MonoBehaviour
                 item.tag = slot.tag;
             } 
         }
+    }
+
+    private void OnValidate()
+    {
+        if (LevelPages != null) OnItemsArrayUpdate();
+    }
+
+    public void OnItemsArrayUpdate()
+    {
+        bool[] isChecked = new bool[itemsArray.Length];
+
+        for (int pageNum = 0; pageNum < LevelPages.transform.childCount; pageNum++)
+        {
+            Transform page = LevelPages.transform.GetChild(pageNum);
+            int ItmesInsideCount = 0; // для удаления пустой страницы
+            for (int slotNum = 0; slotNum < page.childCount; slotNum++)
+            {
+                Transform slot = page.transform.GetChild(slotNum);
+                if (slot.childCount != 0)
+                {
+                    GameObject item = slot.GetChild(0).gameObject;
+                    int itemTag = -1;
+                    if (item.tag.Length >= 5) itemTag = int.Parse(item.tag.Substring(4, 1)) - 1;
+                    if (itemTag < itemsArray.Length && itemTag != -1)
+                    {
+                        if (itemsArray[itemTag] == null)
+                        {
+                            UnityEditor.EditorApplication.delayCall += () => {DestroyImmediate(item);};
+                        }
+                        isChecked[itemTag] = true;
+                    }
+                    else UnityEditor.EditorApplication.delayCall += () => { DestroyImmediate(item); };
+                }
+                else ItmesInsideCount++; //для удаления пустой страницы
+                if (ItmesInsideCount == 6 && pageNum == LevelPages.transform.childCount - 1) UnityEditor.EditorApplication.delayCall += () => { DelatePage(); }; //для удаления пустой страницы
+            }
+        }
+        for (int i = 0; i < itemsArray.Length; i++)
+        {
+            if (itemsArray[i] != null && isChecked[i] == false)
+            {
+                int current = i;
+                UnityEditor.EditorApplication.delayCall += () => { AddNewItem(current); };
+            }
+        }
+    }
+
+    // вариант для массива
+    private void AddNewItem(int index)
+    {
+        string itemName = newItemName;
+        for (int pageNum = 0; pageNum < LevelPages.transform.childCount; pageNum++)
+        {
+            Transform page = LevelPages.transform.GetChild(pageNum);
+            for (int slotNum = 0; slotNum < page.childCount; slotNum++)
+            {
+                Transform slot = page.transform.GetChild(slotNum);
+                if (slot.childCount == 0)
+                {
+                    GameObject newItem = Instantiate(itemPrefab);
+                    newItem.transform.SetParent(slot);
+                    newItem.transform.localScale = Vector3.one;
+
+                    newItem.tag = string.Format("Slot{0}", index+1);
+                    // Debug.Log(string.Format("{0}", index + 1));
+
+                    GameObject itemNameObject = new GameObject(itemName);
+                    Text itemUIText = itemNameObject.AddComponent<Text>();
+                    itemUIText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                    itemUIText.text = itemName;
+                    itemUIText.raycastTarget = false;
+                    itemUIText.fontSize = 24;
+                    itemUIText.color = Color.black;
+                    itemUIText.alignment = TextAnchor.MiddleCenter;
+                    itemNameObject.transform.SetParent(newItem.transform);
+                    inputItemNameWindow.SetActive(false);
+                    return;
+                }
+            }
+        }
+        MakeNewPage();
+        AddNewItem(index);
     }
 
     // Start is called before the first frame update
