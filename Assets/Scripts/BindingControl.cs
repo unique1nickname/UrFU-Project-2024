@@ -8,12 +8,9 @@ using static UnityEditor.Progress;
 
 public class BindingControl : MonoBehaviour
 {
-    private bool OnSetting = false;
     [SerializeField] public GameObject Grid;
     [SerializeField] public GameObject LevelPages;
     [SerializeField] public GameObject pagePrefab;
-    [SerializeField] public GameObject itemPrefab;
-    [SerializeField] public GameObject inputItemNameWindow;
     [SerializeField] public GameObject answerCounter;
 
 
@@ -39,44 +36,7 @@ public class BindingControl : MonoBehaviour
         if (LevelPages.transform.childCount > 1)
         {
             DestroyImmediate(LevelPages.transform.GetChild(LevelPages.transform.childCount - 1).gameObject);
-            // LevelPages.transform.GetChild(LevelPages.transform.childCount - 1).gameObject.SetActive(false);
         }
-    }
-
-    public void AddNewItem()
-    {
-        string itemName = newItemName;
-        for (int pageNum = 0; pageNum < LevelPages.transform.childCount; pageNum++)
-        {
-            Transform page = LevelPages.transform.GetChild(pageNum);
-            for (int slotNum = 0; slotNum < page.childCount; slotNum++)
-            {
-                Transform slot = page.transform.GetChild(slotNum);
-                if (slot.childCount == 0)
-                {
-                    GameObject newItem = Instantiate(itemPrefab);
-                    newItem.transform.SetParent(slot);
-                    newItem.transform.localScale = Vector3.one;
-
-                    // убрать после приведения скрипта в порядок
-                    if (OnSetting) newItem.tag = "setting";
-                    
-                    GameObject itemNameObject = new GameObject(itemName);
-                    Text itemUIText = itemNameObject.AddComponent<Text>();
-                    itemUIText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                    itemUIText.text = itemName;
-                    itemUIText.raycastTarget = false;
-                    itemUIText.fontSize = 24;
-                    itemUIText.color = Color.black;
-                    itemUIText.alignment = TextAnchor.MiddleCenter;
-                    itemNameObject.transform.SetParent(newItem.transform);
-                    inputItemNameWindow.SetActive(false);
-                    return;
-                }
-            }
-        }
-        MakeNewPage();
-        AddNewItem();
     }
 
     public void ClearAllSlots()
@@ -95,52 +55,6 @@ public class BindingControl : MonoBehaviour
         }
     }
 
-    public void StartSettingItems()
-    {
-        // обходит пулл и ставит всем айтемам тег setting
-        OnSetting = true;
-        for (int pageNum = 0; pageNum < LevelPages.transform.childCount; pageNum++)
-        {
-            Transform page = LevelPages.transform.GetChild(pageNum);
-            for (int slotNum = 0; slotNum < page.childCount; slotNum++)
-            {
-                Transform slot = page.transform.GetChild(slotNum);
-                if (slot.childCount != 0)
-                {
-                    GameObject item = slot.GetChild(0).gameObject;
-                    item.tag = "setting";
-                }
-            }
-        }
-    }
-
-    public void EndSettingItems()
-    {
-        OnSetting = false;
-        for (int pageNum = 0; pageNum < LevelPages.transform.childCount; pageNum++)
-        {
-            Transform page = LevelPages.transform.GetChild(pageNum);
-            for (int slotNum = 0; slotNum < page.childCount; slotNum++)
-            {
-                Transform slot = page.transform.GetChild(slotNum);
-                if (slot.childCount != 0)
-                {
-                    GameObject item = slot.GetChild(0).gameObject;
-                    item.tag = "Untagged";
-                }
-            }
-        }
-        for (int slotNum = 0; slotNum < Grid.transform.childCount; slotNum++)
-        {
-            GameObject slot = Grid.transform.GetChild(slotNum).gameObject;
-            if (slot.transform.childCount != 0)
-            {
-                GameObject item = slot.transform.GetChild(0).gameObject;
-                item.tag = slot.tag;
-            } 
-        }
-    }
-
     private void OnValidate()
     {
         if (LevelPages != null) OnItemsArrayUpdate();
@@ -153,7 +67,7 @@ public class BindingControl : MonoBehaviour
         for (int pageNum = 0; pageNum < LevelPages.transform.childCount; pageNum++)
         {
             Transform page = LevelPages.transform.GetChild(pageNum);
-            int ItmesInsideCount = 0; // для удаления пустой страницы
+            int ItmesInsideCount = 0; // для удаления пустой страницы, возможно подвергнется изменениям
             for (int slotNum = 0; slotNum < page.childCount; slotNum++)
             {
                 Transform slot = page.transform.GetChild(slotNum);
@@ -186,7 +100,6 @@ public class BindingControl : MonoBehaviour
         }
     }
 
-    // вариант для массива
     private void AddNewItem(int index)
     {
         string itemName = newItemName;
@@ -198,7 +111,7 @@ public class BindingControl : MonoBehaviour
                 Transform slot = page.transform.GetChild(slotNum);
                 if (slot.childCount == 0)
                 {
-                    GameObject newItem = Instantiate(itemPrefab);
+                    GameObject newItem = Instantiate(itemsArray[index]);
                     newItem.transform.SetParent(slot);
                     newItem.transform.localScale = Vector3.one;
 
@@ -214,7 +127,6 @@ public class BindingControl : MonoBehaviour
                     itemUIText.color = Color.black;
                     itemUIText.alignment = TextAnchor.MiddleCenter;
                     itemNameObject.transform.SetParent(newItem.transform);
-                    inputItemNameWindow.SetActive(false);
                     return;
                 }
             }
@@ -250,7 +162,6 @@ public class BindingControl : MonoBehaviour
                 }
             }
             answerCounterText.text = answerCount.ToString() + "/6";
-            if (OnSetting) answerCounterText.text += "\n(on setting)";
         }
     }
 }
