@@ -133,10 +133,9 @@ GameObject:
   - component: {fileID: 1278667}
   - component: {fileID: 1278669}
   - component: {fileID: 1278668}
-  - component: {fileID: 1278670}
   m_Layer: 5
   m_Name: Level Pages
-  m_TagString: Untagged
+  m_TagString: LevelPageContainer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -201,25 +200,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &1278670
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1278666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e5b332df5f0c994f9033b553ef9c038, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Grid: {fileID: 0}
-  LevelPages: {fileID: 0}
-  pagePrefab: {fileID: 0}
-  answerCounter: {fileID: 0}
-  inputItemNameField: {fileID: 0}
-  newItemName: 
-  itemsArray: []
 --- !u!1 &58010294
 GameObject:
   m_ObjectHideFlags: 0
@@ -1751,7 +1731,7 @@ GameObject:
   - component: {fileID: 1081313535}
   m_Layer: 5
   m_Name: Grid
-  m_TagString: Untagged
+  m_TagString: AnswerGrid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3223,7 +3203,7 @@ GameObject:
   - component: {fileID: 1600549378}
   m_Layer: 5
   m_Name: Scroll View
-  m_TagString: Untagged
+  m_TagString: PagesScrollView
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3362,9 +3342,15 @@ MonoBehaviour:
   LevelPages: {fileID: 1278666}
   pagePrefab: {fileID: 4844604249545346755, guid: 920da6ff0bab3b44c885af42007f95a6, type: 3}
   answerCounter: {fileID: 58010294}
-  inputItemNameField: {fileID: 0}
-  newItemName: 1234
+  newItemName: 1
   itemsArray: []
+  itmesInAnswerGridArray:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!1001 &1627011931
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4469,6 +4455,10 @@ PrefabInstance:
     - target: {fileID: 4844604249545346755, guid: 920da6ff0bab3b44c885af42007f95a6, type: 3}
       propertyPath: m_Name
       value: Page 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4844604249545346755, guid: 920da6ff0bab3b44c885af42007f95a6, type: 3}
+      propertyPath: m_TagString
+      value: LevelPage
       objectReference: {fileID: 0}
     - target: {fileID: 5626988923854641068, guid: 920da6ff0bab3b44c885af42007f95a6, type: 3}
       propertyPath: m_CellSize.x

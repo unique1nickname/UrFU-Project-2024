@@ -10,12 +10,12 @@ TagManager:
   - Slot4
   - Slot5
   - Slot6
-  - setting
   - Slot7
   - Slot8
-  - Slot9
-  - Slot10
-  - Slot11
+  - AnswerGrid
+  - LevelPage
+  - LevelPageContainer
+  - PagesScrollView
   layers:
   - Default
   - TransparentFX

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEditor.Progress;
@@ -14,12 +15,13 @@ public class BindingControl : MonoBehaviour
     [SerializeField] public GameObject answerCounter;
 
 
-    [SerializeField] InputField inputItemNameField;
+    // [SerializeField] InputField inputItemNameField;
     
     // для функции в инспекторе
     [HideInInspector] public string newItemName;
 
     [SerializeField] public GameObject[] itemsArray;
+    [HideInInspector] public GameObject[] itmesInAnswerGridArray;
 
     public void MakeNewPage()
     {
@@ -58,6 +60,7 @@ public class BindingControl : MonoBehaviour
     private void OnValidate()
     {
         if (LevelPages != null) OnItemsArrayUpdate();
+        itmesInAnswerGridArray = new GameObject[Grid.transform.childCount];
     }
 
     public void OnItemsArrayUpdate()
@@ -71,20 +74,25 @@ public class BindingControl : MonoBehaviour
             for (int slotNum = 0; slotNum < page.childCount; slotNum++)
             {
                 Transform slot = page.transform.GetChild(slotNum);
-                if (slot.childCount != 0)
+                if (slot.childCount != 0) // ТЭГ удаляет объекты, которых нет в массиве по тэгу 
                 {
                     GameObject item = slot.GetChild(0).gameObject;
-                    int itemTag = -1;
-                    if (item.tag.Length >= 5) itemTag = int.Parse(item.tag.Substring(4, 1)) - 1;
-                    if (itemTag < itemsArray.Length && itemTag != -1)
-                    {
-                        if (itemsArray[itemTag] == null)
-                        {
-                            UnityEditor.EditorApplication.delayCall += () => {DestroyImmediate(item);};
-                        }
-                        isChecked[itemTag] = true;
-                    }
-                    else UnityEditor.EditorApplication.delayCall += () => { DestroyImmediate(item); };
+
+                    int itemIndex = Array.IndexOf(itemsArray, item);
+                    if (itemIndex == -1) UnityEditor.EditorApplication.delayCall += () => { DestroyImmediate(item); };
+                    else if (itemIndex < itemsArray.Length) isChecked[itemIndex] = true;
+
+                    //int itemTag = -1;
+                    //if (item.tag.Length >= 5) itemTag = int.Parse(item.tag.Substring(4, 1)) - 1;
+                    //if (itemTag < itemsArray.Length && itemTag != -1)
+                    //{
+                    //    if (itemsArray[itemTag] == null)
+                    //    {
+                    //        UnityEditor.EditorApplication.delayCall += () => {DestroyImmediate(item);};
+                    //    }
+                    //    isChecked[itemTag] = true;
+                    //}
+                    //else UnityEditor.EditorApplication.delayCall += () => { DestroyImmediate(item); };
                 }
                 else ItmesInsideCount++; //для удаления пустой страницы
                 if (ItmesInsideCount == 6 && pageNum == LevelPages.transform.childCount - 1) UnityEditor.EditorApplication.delayCall += () => { DelatePage(); }; //для удаления пустой страницы
@@ -115,8 +123,8 @@ public class BindingControl : MonoBehaviour
                     newItem.transform.SetParent(slot);
                     newItem.transform.localScale = Vector3.one;
 
-                    newItem.tag = string.Format("Slot{0}", index+1);
-                    // Debug.Log(string.Format("{0}", index + 1));
+                    //newItem.tag = string.Format("Slot{0}", index + 1); // тут покоятся теги, не тревожить Press F to basically do nothing, they don't deserve any respect
+                    //Debug.Log(string.Format("{0}", index + 1));
 
                     GameObject itemNameObject = new GameObject(itemName);
                     Text itemUIText = itemNameObject.AddComponent<Text>();
@@ -127,6 +135,10 @@ public class BindingControl : MonoBehaviour
                     itemUIText.color = Color.black;
                     itemUIText.alignment = TextAnchor.MiddleCenter;
                     itemNameObject.transform.SetParent(newItem.transform);
+
+                    newItem.name = itemName;
+                    // заменяем прифаб на созданный айтем, ибо а как ещё проводить сравнение по индексам в двух массивах??
+                    itemsArray[index] = newItem;
                     return;
                 }
             }
@@ -155,7 +167,8 @@ public class BindingControl : MonoBehaviour
                 if (slot.transform.childCount != 0)
                 {
                     GameObject item = slot.transform.GetChild(0).gameObject;
-                    if (item.tag == slot.tag)
+                    //if (item.tag == slot.tag) answerCount++;  // остаток от сравнения по тегам
+                    if (item == itemsArray[slotNum])
                     {
                         answerCount++;
                     }
