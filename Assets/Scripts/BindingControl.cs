@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -13,7 +14,7 @@ public class BindingControl : MonoBehaviour
     [SerializeField] public GameObject LevelPages;
     [SerializeField] public GameObject pagePrefab;
     [SerializeField] public GameObject answerCounter;
-
+    [SerializeField] public GameObject inventorySlot;
 
     // [SerializeField] InputField inputItemNameField;
     
@@ -21,7 +22,7 @@ public class BindingControl : MonoBehaviour
     [HideInInspector] public string newItemName;
 
     [SerializeField] public GameObject[] itemsArray;
-    [HideInInspector] public GameObject[] itmesInAnswerGridArray;
+    //[HideInInspector] public GameObject[] itmesInAnswerGridArray; // так и не понадобился(
 
     public void MakeNewPage()
     {
@@ -59,8 +60,14 @@ public class BindingControl : MonoBehaviour
 
     private void OnValidate()
     {
-        if (LevelPages != null) OnItemsArrayUpdate();
-        itmesInAnswerGridArray = new GameObject[Grid.transform.childCount];
+        if (LevelPages != null) 
+        {     
+            OnItemsArrayUpdate();
+
+            OnAnswerGridUpdate();
+        }
+        // itmesInAnswerGridArray = new GameObject[Grid.transform.childCount];
+
     }
 
     public void OnItemsArrayUpdate()
@@ -74,7 +81,7 @@ public class BindingControl : MonoBehaviour
             for (int slotNum = 0; slotNum < page.childCount; slotNum++)
             {
                 Transform slot = page.transform.GetChild(slotNum);
-                if (slot.childCount != 0) // ТЭГ удаляет объекты, которых нет в массиве по тэгу 
+                if (slot.childCount != 0) // удаляет объекты, которых нет в массиве по тэгу 
                 {
                     GameObject item = slot.GetChild(0).gameObject;
 
@@ -147,6 +154,43 @@ public class BindingControl : MonoBehaviour
         AddNewItem(index);
     }
 
+    public void OnAnswerGridUpdate()
+    {
+        int slotCount = itemsArray.Count(s => s != null);
+        //Debug.Log("slotCount = " + slotCount + "; Grid.childCount = " + Grid.transform.childCount);
+        if (slotCount < Grid.transform.childCount)
+        {
+            for (int i = 0; i < Grid.transform.childCount; i++)
+            {
+                if (slotCount == 0)
+                {
+                    GameObject slot = Grid.transform.GetChild(i).gameObject;
+                    UnityEditor.EditorApplication.delayCall += () => 
+                    {
+                        DestroyImmediate(slot);
+                        answerCounter.GetComponent<TMP_Text>().text = "0/" + Grid.transform.childCount;
+                    };
+                }
+                else slotCount--;
+            }
+        }
+        else if (slotCount > Grid.transform.childCount)
+        {
+            int count = Grid.transform.childCount;
+            for (; count < slotCount; count++)
+            {
+                UnityEditor.EditorApplication.delayCall += () =>
+                {
+                    GameObject slot = Instantiate(inventorySlot);
+                    slot.transform.SetParent(Grid.transform);
+                    slot.transform.localScale = Vector3.one;
+                    // Debug.Log("hello there!");
+                    answerCounter.GetComponent<TMP_Text>().text = "0/" + Grid.transform.childCount;
+                };
+            }
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -174,7 +218,7 @@ public class BindingControl : MonoBehaviour
                     }
                 }
             }
-            answerCounterText.text = answerCount.ToString() + "/6";
+            answerCounterText.text = answerCount.ToString() + "/" + Grid.transform.childCount;
         }
     }
 }

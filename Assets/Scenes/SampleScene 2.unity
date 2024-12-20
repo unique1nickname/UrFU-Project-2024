@@ -3344,13 +3344,6 @@ MonoBehaviour:
   answerCounter: {fileID: 58010294}
   newItemName: 1
   itemsArray: []
-  itmesInAnswerGridArray:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!1001 &1627011931
 PrefabInstance:
   m_ObjectHideFlags: 0

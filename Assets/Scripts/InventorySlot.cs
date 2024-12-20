@@ -16,7 +16,15 @@ public class InventorySlot : MonoBehaviour, IDropHandler
             // костылище... выискивает объект со скриптом BindingControl через перетаскиваемый объект.
             if (transform.parent != null && transform.parent.tag == "AnswerGrid")
             {
-                Transform page = draggableItem.initialParent.parent;
+                Transform page;
+                try
+                {
+                    page = draggableItem.initialParent.parent;
+                }
+                catch
+                {
+                    return;
+                }
                 if (page != null && page.tag == "LevelPage")
                 {
                     Transform ScrollView = page.parent.parent;
