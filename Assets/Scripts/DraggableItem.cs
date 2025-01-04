@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -32,5 +33,25 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         image.raycastTarget = true;
         initialParent = transform.parent;
     }
+
+
+    // сравнение айтемов, удалить.
+    //public override bool Equals(object other)
+    //{
+    //    //if (other is DraggableItem && transform.childCount != 0 && ((DraggableItem) other).transform.childCount != 0)
+    //    //{
+    //    //    var otherDI = (DraggableItem) other;
+    //    //    var otherText = otherDI.transform.GetChild(0).GetComponent<TMP_Text>();
+    //    //    var text = transform.GetComponent<TMP_Text>();
+    //    //    if (text.text == otherText.text) return true;
+    //    //}
+    //    if (other is DraggableItem && name == ((DraggableItem)other).name) return true; 
+    //    return base.Equals(other);
+    //}
+
+    //public override int GetHashCode()
+    //{
+    //    return (name != null ? name.GetHashCode() : 0);
+    //}
 }
 

@@ -10,7 +10,10 @@ using static UnityEditor.Progress;
 
 public class BindingControl : MonoBehaviour
 {
-    [SerializeField] public GameObject Grid;
+    [SerializeField] public GameObject[] Grids;
+    [HideInInspector] public int currentGrid;
+    public GameObject Grid => Grids.Length > 0 ? Grids[currentGrid] : null;
+
     [SerializeField] public GameObject LevelPages;
     [SerializeField] public GameObject pagePrefab;
     [SerializeField] public GameObject answerCounter;
@@ -141,6 +144,13 @@ public class BindingControl : MonoBehaviour
                     itemUIText.fontSize = 24;
                     itemUIText.color = Color.black;
                     itemUIText.alignment = TextAnchor.MiddleCenter;
+                    if (newItem.transform.childCount != 0)
+                    {
+                        foreach (Transform child in newItem.transform)
+                        {
+                            GameObject.DestroyImmediate(child.gameObject);
+                        }
+                    }
                     itemNameObject.transform.SetParent(newItem.transform);
 
                     newItem.name = itemName;
@@ -157,26 +167,27 @@ public class BindingControl : MonoBehaviour
     public void OnAnswerGridUpdate()
     {
         int slotCount = itemsArray.Count(s => s != null);
+        int slotCountInGrids = GetSlotCountInGrids();
         //Debug.Log("slotCount = " + slotCount + "; Grid.childCount = " + Grid.transform.childCount);
-        if (slotCount < Grid.transform.childCount)
+        if (slotCount < slotCountInGrids)
         {
-            for (int i = 0; i < Grid.transform.childCount; i++)
+            for (int i = 0; i < slotCountInGrids; i++)
             {
                 if (slotCount == 0)
                 {
-                    GameObject slot = Grid.transform.GetChild(i).gameObject;
+                    GameObject slot = GetSlotInGrid(i).gameObject;
                     UnityEditor.EditorApplication.delayCall += () => 
                     {
                         DestroyImmediate(slot);
-                        answerCounter.GetComponent<TMP_Text>().text = "0/" + Grid.transform.childCount;
+                        answerCounter.GetComponent<TMP_Text>().text = "0/" + GetSlotCountInGrids();
                     };
                 }
                 else slotCount--;
             }
         }
-        else if (slotCount > Grid.transform.childCount)
+        else if (slotCount > slotCountInGrids)
         {
-            int count = Grid.transform.childCount;
+            int count = slotCountInGrids;
             for (; count < slotCount; count++)
             {
                 UnityEditor.EditorApplication.delayCall += () =>
@@ -185,10 +196,31 @@ public class BindingControl : MonoBehaviour
                     slot.transform.SetParent(Grid.transform);
                     slot.transform.localScale = Vector3.one;
                     // Debug.Log("hello there!");
-                    answerCounter.GetComponent<TMP_Text>().text = "0/" + Grid.transform.childCount;
+                    answerCounter.GetComponent<TMP_Text>().text = "0/" + GetSlotCountInGrids();
                 };
             }
         }
+    }
+
+    public int GetSlotCountInGrids()
+    {
+        int count = 0;
+        foreach (GameObject grid in Grids)
+        {
+            count += grid.transform.childCount;
+        }
+        return count;
+    }
+
+    public Transform GetSlotInGrid(int index)
+    {
+        int count = 0;
+        foreach (GameObject grid in Grids)
+        {
+            if (count + grid.transform.childCount > index) return grid.transform.GetChild(index - count);
+            count += grid.transform.childCount;
+        }
+        return null;
     }
 
     // Start is called before the first frame update
@@ -204,10 +236,11 @@ public class BindingControl : MonoBehaviour
         if (Input.GetMouseButtonUp(0) && Grid != null)
         {
             int answerCount = 0;
+            int slotCountInGrids = GetSlotCountInGrids();
             TMP_Text answerCounterText = answerCounter.GetComponent<TMP_Text>();
-            for (int slotNum = 0; slotNum < Grid.transform.childCount; slotNum++)
+            for (int slotNum = 0; slotNum < slotCountInGrids; slotNum++)
             {
-                GameObject slot = Grid.transform.GetChild(slotNum).gameObject;
+                GameObject slot = GetSlotInGrid(slotNum).gameObject;
                 if (slot.transform.childCount != 0)
                 {
                     GameObject item = slot.transform.GetChild(0).gameObject;
@@ -218,7 +251,7 @@ public class BindingControl : MonoBehaviour
                     }
                 }
             }
-            answerCounterText.text = answerCount.ToString() + "/" + Grid.transform.childCount;
+            answerCounterText.text = answerCount.ToString() + "/" + slotCountInGrids;
         }
     }
 }
