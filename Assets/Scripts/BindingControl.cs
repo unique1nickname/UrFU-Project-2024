@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEditor.Progress;
@@ -133,16 +134,13 @@ public class BindingControl : MonoBehaviour
                     newItem.transform.SetParent(slot);
                     newItem.transform.localScale = Vector3.one;
 
-                    //newItem.tag = string.Format("Slot{0}", index + 1); // тут покоятся теги, не тревожить Press F to basically do nothing, they don't deserve any respect
-                    //Debug.Log(string.Format("{0}", index + 1));
-
                     GameObject itemNameObject = new GameObject(itemName);
                     Text itemUIText = itemNameObject.AddComponent<Text>();
                     itemUIText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
                     itemUIText.text = itemName;
                     itemUIText.raycastTarget = false;
                     itemUIText.fontSize = 24;
-                    itemUIText.color = Color.black;
+                    itemUIText.color = Color.white;
                     itemUIText.alignment = TextAnchor.MiddleCenter;
                     if (newItem.transform.childCount != 0)
                     {
@@ -151,17 +149,32 @@ public class BindingControl : MonoBehaviour
                             GameObject.DestroyImmediate(child.gameObject);
                         }
                     }
-                    itemNameObject.transform.SetParent(newItem.transform);
 
+                    ContentSizeFitter contentSizeFitter = itemNameObject.AddComponent<ContentSizeFitter>();
+                    contentSizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+                    contentSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+                    itemNameObject.transform.SetParent(newItem.transform);
                     newItem.name = itemName;
-                    // заменяем прифаб на созданный айтем, ибо а как ещё проводить сравнение по индексам в двух массивах??
-                    itemsArray[index] = newItem;
+
+                    SetCellSizeBasedOnTextSize(newItem);
+                    
+                    itemsArray[index] = newItem;    // заменяем прифаб на созданный айтем, ибо а как ещё проводить сравнение по индексам в двух массивах??
                     return;
                 }
             }
         }
         MakeNewPage();
         AddNewItem(index);
+    }
+
+    public void SetCellSizeBasedOnTextSize(GameObject item)
+    {
+        GridLayoutGroup gridLayoutGroup = item.transform.parent.GetComponent<GridLayoutGroup>();
+        Transform itemNameObject = item.transform.GetChild(0);
+        Text itemUIText = itemNameObject.GetComponent<Text>();
+        float PaddingX = 25; // отступы по бокам от текста
+        gridLayoutGroup.cellSize = new Vector2((itemUIText.preferredWidth + PaddingX) * itemNameObject.localScale.x, gridLayoutGroup.cellSize.y);
     }
 
     public void OnAnswerGridUpdate()
@@ -197,6 +210,16 @@ public class BindingControl : MonoBehaviour
                     slot.transform.localScale = Vector3.one;
                     // Debug.Log("hello there!");
                     answerCounter.GetComponent<TMP_Text>().text = "0/" + GetSlotCountInGrids();
+
+                    GridLayoutGroup glg = Grid.GetComponent<GridLayoutGroup>();
+                    if (glg == null || !glg.enabled) // задаёт размер и позицию объекту, если он не в сетке
+                    {
+                        int Width = 70;
+                        int Height = 50;
+                        RectTransform rect = slot.GetComponent<RectTransform>();
+                        rect.sizeDelta = new Vector2(Width, Height);
+                        rect.anchoredPosition = new Vector2(0, 0);
+                    }
                 };
             }
         }
@@ -226,7 +249,10 @@ public class BindingControl : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        foreach (GameObject item in itemsArray)
+        {
+            SetCellSizeBasedOnTextSize(item);
+        }
     }
 
     // Update is called once per frame

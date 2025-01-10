@@ -32,6 +32,16 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         transform.SetParent(parentAfterDrag);
         image.raycastTarget = true;
         initialParent = transform.parent;
+
+        if (transform.parent.parent != null && transform.parent.parent.tag == "LevelPage")
+        {
+            Transform item = transform;
+            GridLayoutGroup gridLayoutGroup = transform.parent.GetComponent<GridLayoutGroup>();
+            Transform itemNameObject = item.transform.GetChild(0);
+            Text itemUIText = itemNameObject.GetComponent<Text>();
+            float PaddingX = 25; // отступы по бокам от текста
+            gridLayoutGroup.cellSize = new Vector2((itemUIText.preferredWidth + PaddingX) * itemNameObject.localScale.x, gridLayoutGroup.cellSize.y);
+        }
     }
 
 
