@@ -1,13 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class BindingControl : MonoBehaviour
 {
@@ -64,6 +59,7 @@ public class BindingControl : MonoBehaviour
 
     private void OnValidate()
     {
+        #if UNITY_EDITOR
         if (LevelPages != null) 
         {     
             OnItemsArrayUpdate();
@@ -71,9 +67,10 @@ public class BindingControl : MonoBehaviour
             OnAnswerGridUpdate();
         }
         // itmesInAnswerGridArray = new GameObject[Grid.transform.childCount];
-
+        #endif
     }
 
+    #if UNITY_EDITOR
     public void OnItemsArrayUpdate()
     {
         bool[] isChecked = new bool[itemsArray.Length];
@@ -118,6 +115,7 @@ public class BindingControl : MonoBehaviour
             }
         }
     }
+    #endif
 
     private void AddNewItem(int index)
     {
@@ -177,6 +175,7 @@ public class BindingControl : MonoBehaviour
         gridLayoutGroup.cellSize = new Vector2((itemUIText.preferredWidth + PaddingX) * itemNameObject.localScale.x, gridLayoutGroup.cellSize.y);
     }
 
+    #if UNITY_EDITOR
     public void OnAnswerGridUpdate()
     {
         int slotCount = itemsArray.Count(s => s != null);
@@ -224,6 +223,7 @@ public class BindingControl : MonoBehaviour
             }
         }
     }
+    #endif
 
     public int GetSlotCountInGrids()
     {
