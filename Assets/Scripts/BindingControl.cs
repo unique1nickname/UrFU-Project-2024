@@ -230,6 +230,7 @@ public class BindingControl : MonoBehaviour
         int count = 0;
         foreach (GameObject grid in Grids)
         {
+            if (grid == null) continue; // óýýýýýýý
             count += grid.transform.childCount;
         }
         return count;

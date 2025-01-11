@@ -25,6 +25,7 @@ public class InventorySlot : MonoBehaviour, IDropHandler
                     int prevSlotsNumber = grid.GetPreviousSlotsNumber(); // нужен на случай, если на сцене несколько Grid'ов
                     BindingControl bc = scrollView.GetComponent<BindingControl>();
                     if (transform.GetSiblingIndex() + prevSlotsNumber == Array.IndexOf(bc.itemsArray, dropped)) draggableItem.parentAfterDrag = transform;
+                    Debug.Log("transform.GetSiblingIndex() + prevSlotsNumber = " + transform.GetSiblingIndex() + " + " + prevSlotsNumber + "; Array.IndexOf(bc.itemsArray, dropped) = " + Array.IndexOf(bc.itemsArray, dropped));
                 }
             }
             else if (draggableItem != null && (gameObject.tag == "Untagged" || draggableItem.tag == gameObject.tag)) draggableItem.parentAfterDrag = transform;
