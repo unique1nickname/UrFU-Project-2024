@@ -4,6 +4,8 @@ using UnityEngine.EventSystems;
 
 public class InventorySlot : MonoBehaviour, IDropHandler
 {
+    // После последних изменений тут в принципе можно большу часть кода убрать 
+    // надо будет этим заняться
     public void OnDrop(PointerEventData eventData)
     {
         if (transform.childCount == 0)
@@ -17,10 +19,11 @@ public class InventorySlot : MonoBehaviour, IDropHandler
                 GameObject scrollView = grid.PagesScrollView;
                 if (scrollView != null && scrollView.tag == "PagesScrollView") 
                 { 
-                    int prevSlotsNumber = grid.GetPreviousSlotsNumber(); // нужен на случай, если на сцене несколько Grid'ов
-                    BindingControl bc = scrollView.GetComponent<BindingControl>();
-                    if (transform.GetSiblingIndex() + prevSlotsNumber == Array.IndexOf(bc.itemsArray, dropped)) draggableItem.parentAfterDrag = transform;
-                    Debug.Log("transform.GetSiblingIndex() + prevSlotsNumber = " + transform.GetSiblingIndex() + " + " + prevSlotsNumber + "; Array.IndexOf(bc.itemsArray, dropped) = " + Array.IndexOf(bc.itemsArray, dropped));
+                    // int prevSlotsNumber = grid.GetPreviousSlotsNumber(); // нужен на случай, если на сцене несколько Grid'ов
+                    // BindingControl bc = scrollView.GetComponent<BindingControl>();
+                    // if (transform.GetSiblingIndex() + prevSlotsNumber == Array.IndexOf(bc.itemsArray, dropped)) draggableItem.parentAfterDrag = transform;
+                    draggableItem.parentAfterDrag = transform;
+                    // Debug.Log("transform.GetSiblingIndex() + prevSlotsNumber = " + transform.GetSiblingIndex() + " + " + prevSlotsNumber + "; Array.IndexOf(bc.itemsArray, dropped) = " + Array.IndexOf(bc.itemsArray, dropped));
                 }
             }
             else if (draggableItem != null && (gameObject.tag == "Untagged" || draggableItem.tag == gameObject.tag)) draggableItem.parentAfterDrag = transform;

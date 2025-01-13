@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -13,6 +14,8 @@ public class SwipeController : MonoBehaviour, IEndDragHandler
     [SerializeField] float tweenTime;
     [SerializeField] LeanTweenType tweenType;
 
+    [SerializeField] GameObject pageNumberText;
+
     float dragThreshould;
 
     private void Awake()
@@ -21,6 +24,7 @@ public class SwipeController : MonoBehaviour, IEndDragHandler
         currentPage = 1;
         targetPos = levelPagesRect.localPosition;
         dragThreshould = Screen.width / 15;
+        pageNumberText.GetComponent<TMP_Text>().text = "<color=#9A9A9A>" + currentPage + "/</color>" + maxPage;
     }
 
     public void Next()
@@ -29,6 +33,7 @@ public class SwipeController : MonoBehaviour, IEndDragHandler
         {
             currentPage++;
             targetPos += pageStep;
+            pageNumberText.GetComponent<TMP_Text>().text = "<color=#9A9A9A>" + currentPage + "/</color>" + maxPage;
             MovePage();
         }
     }
@@ -39,6 +44,7 @@ public class SwipeController : MonoBehaviour, IEndDragHandler
         {
             currentPage--;
             targetPos -= pageStep;
+            pageNumberText.GetComponent<TMP_Text>().text = "<color=#9A9A9A>" + currentPage + "/</color>" + maxPage;
             MovePage();
         }
     }

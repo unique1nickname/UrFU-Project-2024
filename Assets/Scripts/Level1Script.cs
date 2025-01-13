@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -21,8 +23,11 @@ public class Level1Script : MonoBehaviour
 
     public bool Check(GameObject grid)
     {
-        Debug.Log("start checking");
+        // Debug.Log("start checking");
         Transform[] slots = new Transform[grid.transform.childCount];
+        AnswerGrid answerGrid = grid.transform.GetComponent<AnswerGrid>();
+        BindingControl bc = answerGrid.PagesScrollView.GetComponent<BindingControl>();
+        int prevSlotsNumber = answerGrid.GetPreviousSlotsNumber();
         for (int i = 0; i < grid.transform.childCount; i++)
         {
             slots[i] = grid.transform.GetChild(i);
@@ -30,16 +35,30 @@ public class Level1Script : MonoBehaviour
         foreach (Transform slot in slots)
         {
             if (slot.childCount == 0) return false;
+            GameObject item = slot.GetChild(0).gameObject;
+            int slotIndex = slot.GetSiblingIndex() + prevSlotsNumber;
+            int itemIndex = Array.IndexOf(bc.itemsArray, item);
+
+            // Debug.Log(slot.GetSiblingIndex() + " + " + prevSlotsNumber + " = " + itemIndex);
+
+            if (slotIndex != itemIndex)
+            {
+                var matchingIndexes = bc.itemsArray
+                    .Select((obj, index) => new { obj, index })
+                    .Where(pair => pair.obj != null && pair.obj.name == item.name)
+                    .Select(pair => pair.index)
+                    .ToList();
+                if (!matchingIndexes.Contains(slotIndex)) return false;
+            }
         }
-        Debug.Log("hello there!");
         return true;
     }
 
     public void CheckStage(int num)
     {
-        Debug.Log("check button");
+        // Debug.Log("check button");
         if (num != currentStage + 1 || currentStage >= stages.Length) return;
-        Debug.Log("check button 2");
+        // Debug.Log("check button 2");
         if (Check(grids[num-1]))
         {
             currentStage = num;
