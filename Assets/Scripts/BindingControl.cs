@@ -82,27 +82,30 @@ public class BindingControl : MonoBehaviour
             for (int slotNum = 0; slotNum < page.childCount; slotNum++)
             {
                 Transform slot = page.transform.GetChild(slotNum);
+
+                Image image = slot.GetComponent<Image>(); // чтобы убрать или добавить заглушку
+                Color color = image.color;
+
                 if (slot.childCount != 0) // удаляет объекты, которых нет в массиве по тэгу 
                 {
+                    color.a = 0; // для заглушки
+
                     GameObject item = slot.GetChild(0).gameObject;
-
                     int itemIndex = Array.IndexOf(itemsArray, item);
-                    if (itemIndex == -1) UnityEditor.EditorApplication.delayCall += () => { DestroyImmediate(item); };
+                    if (itemIndex == -1) 
+                    {
+                        color.a = 1; // добавляет заглушку
+                        UnityEditor.EditorApplication.delayCall += () => { DestroyImmediate(item); };
+                    }
                     else if (itemIndex < itemsArray.Length) isChecked[itemIndex] = true;
-
-                    //int itemTag = -1;
-                    //if (item.tag.Length >= 5) itemTag = int.Parse(item.tag.Substring(4, 1)) - 1;
-                    //if (itemTag < itemsArray.Length && itemTag != -1)
-                    //{
-                    //    if (itemsArray[itemTag] == null)
-                    //    {
-                    //        UnityEditor.EditorApplication.delayCall += () => {DestroyImmediate(item);};
-                    //    }
-                    //    isChecked[itemTag] = true;
-                    //}
-                    //else UnityEditor.EditorApplication.delayCall += () => { DestroyImmediate(item); };
                 }
-                else ItmesInsideCount++; //для удаления пустой страницы
+                else
+                {
+                    ItmesInsideCount++; //для удаления пустой страницы
+                    color.a = 1; // добавляет заглушку
+                }
+                
+                image.color = color; // для заглушки
                 if (ItmesInsideCount == 6 && pageNum == LevelPages.transform.childCount - 1) UnityEditor.EditorApplication.delayCall += () => { DelatePage(); }; //для удаления пустой страницы
             }
         }

@@ -5,7 +5,7 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 {
     public Image image;
     [HideInInspector] public Transform parentAfterDrag;
-    [HideInInspector] public Transform initialParent; // нужен для костыля в InventorySlot, чтобы выйти через скрипт по айтему на Scroll View
+    [HideInInspector] public Transform initialParent; // нужен для костыля в InventorySlot, чтобы выйти через скрипт по айтему на Scroll View (upd: теперь нужен для другого костыля)
 
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -26,6 +26,15 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     public void OnEndDrag(PointerEventData eventData)
     {
         //Debug.Log("End drag");
+        if (initialParent.parent != null && initialParent.parent.tag == "LevelPage")
+        {
+            // добавляет заглушку
+            Image image = initialParent.GetComponent<Image>();
+            Color color = image.color;
+            color.a = 1;
+            image.color = color;
+        }
+
         transform.SetParent(parentAfterDrag);
         image.raycastTarget = true;
         initialParent = transform.parent;
@@ -38,6 +47,12 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             Text itemUIText = itemNameObject.GetComponent<Text>();
             float PaddingX = 25; // отступы по бокам от текста
             gridLayoutGroup.cellSize = new Vector2((itemUIText.preferredWidth + PaddingX) * itemNameObject.localScale.x, gridLayoutGroup.cellSize.y);
+
+            // убирает заглушку
+            Image image = transform.parent.GetComponent<Image>();
+            Color color = image.color;
+            color.a = 0;
+            image.color = color;
         }
     }
 

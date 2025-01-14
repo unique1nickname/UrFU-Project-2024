@@ -11,6 +11,7 @@ public class Level1Script : MonoBehaviour
     [SerializeField] GameObject[] stages;
 
     [SerializeField] GameObject helpPage;
+    [SerializeField] GameObject wrongAnswerWarning;
 
     public void ChangeStage()
     {
@@ -63,7 +64,9 @@ public class Level1Script : MonoBehaviour
         {
             currentStage = num;
             ChangeStage();
-        };
+            wrongAnswerWarning.SetActive(false);
+        }
+        else wrongAnswerWarning.SetActive(true);
     }
 
     public void OpenHelpPage()
