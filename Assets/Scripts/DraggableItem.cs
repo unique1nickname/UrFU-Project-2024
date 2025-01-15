@@ -54,6 +54,9 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             color.a = 0;
             image.color = color;
         }
+
+        Image itemImage = transform.GetComponent<Image>();
+        itemImage.color = Color.white;
     }
 
 

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Level1Script : MonoBehaviour
 {
@@ -33,9 +34,16 @@ public class Level1Script : MonoBehaviour
         {
             slots[i] = grid.transform.GetChild(i);
         }
+
+        bool isAllRight = true;
+
         foreach (Transform slot in slots)
         {
-            if (slot.childCount == 0) return false;
+            if (slot.childCount == 0) 
+            {
+                isAllRight = false;
+                continue;
+            }
             GameObject item = slot.GetChild(0).gameObject;
             int slotIndex = slot.GetSiblingIndex() + prevSlotsNumber;
             int itemIndex = Array.IndexOf(bc.itemsArray, item);
@@ -49,10 +57,15 @@ public class Level1Script : MonoBehaviour
                     .Where(pair => pair.obj != null && pair.obj.name == item.name)
                     .Select(pair => pair.index)
                     .ToList();
-                if (!matchingIndexes.Contains(slotIndex)) return false;
+                if (!matchingIndexes.Contains(slotIndex)) 
+                {
+                    isAllRight = false;
+                    Image image = item.GetComponent<Image>();
+                    image.color = new Color(0.96f, 0.439f, 0.439f, 1);
+                }
             }
         }
-        return true;
+        return isAllRight;
     }
 
     public void CheckStage(int num)
